@@ -14,7 +14,7 @@ function Assert-UnderRoot([string]$Path, [string]$Root) {
   $resolvedRoot = [System.IO.Path]::GetFullPath($Root)
   $resolvedPath = [System.IO.Path]::GetFullPath($Path)
   if (-not $resolvedPath.StartsWith($resolvedRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
-    throw "Refusing to operate outside target root: $resolvedPath"
+    throw "拒绝在目标目录之外操作：$resolvedPath"
   }
 }
 
@@ -35,7 +35,7 @@ function Resolve-SourceApp {
   if ($Requested) {
     $candidate = [System.IO.Path]::GetFullPath($Requested)
     if (-not (Test-Path -LiteralPath (Join-Path $candidate "resources\app.asar"))) {
-      throw "SourceApp does not look like a Codex app directory: $candidate"
+      throw "SourceApp 看起来不是 Codex App 目录：$candidate"
     }
     return $candidate
   }
@@ -68,7 +68,7 @@ function Resolve-SourceApp {
     }
   }
 
-  throw "Could not locate the installed Codex App. Pass -SourceApp <path-to-installed-app>."
+  throw "无法定位已安装的 Codex App。请传入 -SourceApp <官方安装目录下的 app 路径>。"
 }
 
 function Invoke-Checked {
@@ -80,7 +80,7 @@ function Invoke-Checked {
   & $FilePath @Arguments
   $code = $LASTEXITCODE
   if ($AllowedExitCodes -notcontains $code) {
-    throw "Command failed with exit code ${code}: $FilePath $($Arguments -join ' ')"
+    throw "命令失败，退出码 ${code}: $FilePath $($Arguments -join ' ')"
   }
 }
 
@@ -100,23 +100,23 @@ Assert-UnderRoot $WorkRoot $Root
 New-Item -ItemType Directory -Force -Path $Root, $Backups, $WorkRoot | Out-Null
 
 $Source = Resolve-SourceApp -Requested $SourceApp
-Write-Step "Source app: $Source"
-Write-Step "Target app: $AppDest"
+Write-Step "官方 App 来源：$Source"
+Write-Step "补丁副本目标：$AppDest"
 
 if (Test-Path -LiteralPath $AppDest) {
   Remove-TreeSafe $AppDest $Root
 }
 New-Item -ItemType Directory -Force -Path $AppDest | Out-Null
-Write-Step "Copying full app directory..."
+Write-Step "正在复制完整 App 目录..."
 & robocopy $Source $AppDest /E /R:1 /W:1 /NFL /NDL /NJH /NJS /NP
 $rc = $LASTEXITCODE
 if ($rc -gt 7) {
-  throw "robocopy failed with exit code $rc"
+  throw "robocopy 失败，退出码 $rc"
 }
 
 $Asar = Join-Path $AppDest "resources\app.asar"
 if (-not (Test-Path -LiteralPath $Asar)) {
-  throw "Copied app.asar was not found: $Asar"
+  throw "复制后的 app.asar 未找到：$Asar"
 }
 $TopCodexExe = Join-Path $AppDest "Codex.exe"
 $TopChatGptExe = Join-Path $AppDest "ChatGPT.exe"
@@ -124,7 +124,7 @@ if ((Test-Path -LiteralPath $TopCodexExe) -and (Test-Path -LiteralPath $TopChatG
   $codexShimBackup = Join-Path $AppDest "Codex.exe.original.bak"
   Copy-Item -LiteralPath $TopCodexExe -Destination $codexShimBackup -Force
   Copy-Item -LiteralPath $TopChatGptExe -Destination $TopCodexExe -Force
-  Write-Step "Replaced copied Codex.exe launcher shim with copied Electron executable; original shim backed up in app directory."
+  Write-Step "已替换副本中的 Codex.exe 启动 shim，原 shim 已备份在 app 目录。"
 }
 $originalHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $Asar).Hash
 $localBackup = Join-Path (Split-Path -Parent $Asar) "app.asar.original.bak"
@@ -133,13 +133,13 @@ $hashBackup = Join-Path $Backups "app.asar.$originalHash.bak"
 if (-not (Test-Path -LiteralPath $hashBackup)) {
   Copy-Item -LiteralPath $Asar -Destination $hashBackup -Force
 }
-Write-Step "Backed up app.asar SHA256 $originalHash"
+Write-Step "已备份 app.asar，SHA256 $originalHash"
 
 if (Test-Path -LiteralPath $UnpackDir) {
   Remove-TreeSafe $UnpackDir $Root
 }
 New-Item -ItemType Directory -Force -Path $UnpackDir | Out-Null
-Write-Step "Extracting app.asar..."
+Write-Step "正在解包 app.asar..."
 Invoke-Checked -FilePath "npx.cmd" -Arguments @("--yes", "@electron/asar", "extract", $Asar, $UnpackDir)
 
 $patcher = Join-Path $WorkRoot "patch-webview.mjs"
@@ -276,7 +276,7 @@ fs.writeFileSync(path.join(path.dirname(assetsDir), "..", "patched-js-files.json
 console.log(JSON.stringify({ changedFiles: changedUnique.map((f) => path.relative(unpackDir, f)) }, null, 2));
 '@ | Set-Content -LiteralPath $patcher -Encoding UTF8
 
-Write-Step "Patching WebView JavaScript assets..."
+Write-Step "正在补丁 WebView JavaScript 资源..."
 Invoke-Checked -FilePath "node.exe" -Arguments @($patcher, $UnpackDir)
 $changedFileJson = Join-Path $UnpackDir "patched-js-files.json"
 $changedFiles = (Get-Content -Raw -LiteralPath $changedFileJson | ConvertFrom-Json).changedFiles
@@ -290,17 +290,17 @@ if (-not (Test-Path -LiteralPath $CodexExe)) {
   if ($CodexCli) {
     $CodexExe = $CodexCli
   } else {
-    throw "Cannot find copied resources\codex.exe"
+    throw "无法找到副本中的 resources\codex.exe"
   }
 }
 
-Write-Step "Reading bundled model catalog from copied codex.exe..."
+Write-Step "正在从副本 codex.exe 读取内置模型目录..."
 & $CodexExe debug models --bundled | Set-Content -LiteralPath $BundledModels -Encoding UTF8
 if ($LASTEXITCODE -ne 0) {
-  throw "codex debug models --bundled failed"
+  throw "codex debug models --bundled 执行失败"
 }
 
-Write-Step "Fetching official OpenAI Codex model catalog from current main..."
+Write-Step "正在从 OpenAI 官方 Codex main 分支读取最新模型目录..."
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/openai/codex/main/codex-rs/models-manager/models.json" -OutFile $OfficialModels -UseBasicParsing
 
 $mergeModels = Join-Path $WorkRoot "merge-model-catalog.mjs"
@@ -363,7 +363,7 @@ console.log(JSON.stringify(report, null, 2));
 '@ | Set-Content -LiteralPath $mergeModels -Encoding UTF8
 Invoke-Checked -FilePath "node.exe" -Arguments @($mergeModels, $BundledModels, $OfficialModels, $ModelCatalog, $ModelReport)
 
-Write-Step "Updating user config.toml with model_catalog_json, xhigh effort, and priority service tier..."
+Write-Step "正在更新用户 config.toml：model_catalog_json、xhigh effort、priority service tier..."
 $ConfigPath = Join-Path $env:USERPROFILE ".codex\config.toml"
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $ConfigPath) | Out-Null
 $updateConfig = Join-Path $WorkRoot "update-config.mjs"
@@ -396,7 +396,7 @@ fs.writeFileSync(configPath, text, "utf8");
 '@ | Set-Content -LiteralPath $updateConfig -Encoding UTF8
 Invoke-Checked -FilePath "node.exe" -Arguments @($updateConfig, $ConfigPath, $ModelCatalog)
 
-Write-Step "Repacking app.asar..."
+Write-Step "正在重新打包 app.asar..."
 if (Test-Path -LiteralPath $PackedAsar) {
   Remove-Item -LiteralPath $PackedAsar -Force
 }
@@ -405,14 +405,14 @@ Copy-Item -LiteralPath $PackedAsar -Destination $Asar -Force
 $packedHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $PackedAsar).Hash
 $runtimeHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $Asar).Hash
 if ($packedHash -ne $runtimeHash) {
-  throw "Packed app.asar hash does not match copied runtime app.asar"
+  throw "打包后的 app.asar 与运行时 app.asar SHA256 不一致"
 }
-Write-Step "Packed app.asar SHA256 $runtimeHash"
+Write-Step "已打包 app.asar，SHA256 $runtimeHash"
 
 $shortcutPath = Join-Path $Root "Codex Patched.lnk"
 $targetExe = Join-Path $AppDest "Codex.exe"
 if (-not (Test-Path -LiteralPath $targetExe)) {
-  throw "Shortcut target is missing: $targetExe"
+  throw "快捷方式目标不存在：$targetExe"
 }
 $userDataDir = Join-Path $Root "user-data"
 New-Item -ItemType Directory -Force -Path $userDataDir | Out-Null
@@ -424,7 +424,7 @@ $shortcut.WorkingDirectory = $AppDest
 $shortcut.IconLocation = "$targetExe,0"
 $shortcut.Description = "Codex Patched"
 $shortcut.Save()
-Write-Step "Shortcut created: $shortcutPath"
+Write-Step "已创建快捷方式：$shortcutPath"
 
 $summary = [ordered]@{
   root = $Root
@@ -441,4 +441,4 @@ $summary = [ordered]@{
 }
 $summaryPath = Join-Path $Root "patch-summary.json"
 ($summary | ConvertTo-Json -Depth 8) | Set-Content -LiteralPath $summaryPath -Encoding UTF8
-Write-Step "Summary written: $summaryPath"
+Write-Step "已写入摘要：$summaryPath"

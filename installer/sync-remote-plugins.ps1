@@ -9,13 +9,13 @@ $Script = Join-Path $Root "sync-remote-plugins.mjs"
 $MarketplaceRoot = Join-Path $Root "plugin-marketplace"
 
 if (-not (Test-Path -LiteralPath $Script)) {
-  throw "Missing sync script: $Script"
+  throw "缺少同步脚本：$Script"
 }
 
-Write-Host "[CodexPatched] Syncing local remote-plugin marketplace..."
+Write-Host "[CodexPatched] 正在同步本地远程插件 marketplace..."
 node $Script
 if ($LASTEXITCODE -ne 0) {
-  throw "sync-remote-plugins.mjs failed"
+  throw "sync-remote-plugins.mjs 执行失败"
 }
 
 if (-not $CodexCli) {
@@ -33,21 +33,21 @@ if (-not $CodexCli) {
   if ($localBins) { $CodexCli = $localBins.FullName }
 }
 if (-not $CodexCli) {
-  throw "Could not locate codex.exe for marketplace registration. Pass -CodexCli <path>."
+  throw "无法定位用于注册 marketplace 的 codex.exe。请传入 -CodexCli <路径>。"
 }
 
-Write-Host "[CodexPatched] Registering marketplace: $MarketplaceRoot"
+Write-Host "[CodexPatched] 正在注册 marketplace：$MarketplaceRoot"
 & $CodexCli plugin marketplace add $MarketplaceRoot
 if ($LASTEXITCODE -ne 0) {
   $listJson = & $CodexCli plugin marketplace list --json
   if ($LASTEXITCODE -ne 0 -or $listJson -notmatch "openai-curated-remote-local") {
-    throw "codex plugin marketplace add failed"
+    throw "codex plugin marketplace add 执行失败"
   }
 }
 
 $SummaryPath = Join-Path $Root "plugin-sync-summary.json"
 if (Test-Path -LiteralPath $SummaryPath) {
   $summary = Get-Content -Raw -LiteralPath $SummaryPath | ConvertFrom-Json
-  Write-Host "[CodexPatched] Available local remote plugins: $($summary.availableBundleCount)"
-  Write-Host "[CodexPatched] Missing bundles: $($summary.missingBundleCount)"
+  Write-Host "[CodexPatched] 可用本地远程插件数量：$($summary.availableBundleCount)"
+  Write-Host "[CodexPatched] 缺失 bundle 数量：$($summary.missingBundleCount)"
 }

@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Codex Patched Installer</title>
+  <title>Codex Patched 安装器</title>
   <style>
     :root {
       color-scheme: light dark;
@@ -18,7 +18,7 @@
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
       background:
         radial-gradient(circle at 15% 15%, rgba(56,189,248,.28), transparent 34rem),
         radial-gradient(circle at 85% 10%, rgba(34,197,94,.18), transparent 30rem),
@@ -99,28 +99,28 @@
 </head>
 <body>
   <main>
-    <div class="eyebrow">Unofficial Windows Patcher</div>
-    <h1>Codex Patched Installer</h1>
+    <div class="eyebrow">非官方 Windows 补丁安装器</div>
+    <h1>Codex Patched 安装器</h1>
     <p>
-      Builds a separate patched local copy of the Codex desktop app from the official app already installed on your PC.
-      No official Codex binaries are redistributed in this installer package.
+      在你的电脑上基于已安装的官方 Codex App 构建一个独立的补丁副本。
+      安装包不包含、也不重新分发官方 Codex App 二进制文件。
     </p>
     <div class="actions">
-      <a class="button primary" href="https://github.com/xianyu110/codex-patched-installer/releases/latest/download/CodexPatched-Installer.zip">Download Installer ZIP</a>
-      <a class="button secondary" href="https://github.com/xianyu110/codex-patched-installer">View Source</a>
+      <a class="button primary" href="https://github.com/xianyu110/codex-patched-installer/releases/latest/download/CodexPatched-Installer.zip">下载安装包 ZIP</a>
+      <a class="button secondary" href="https://github.com/xianyu110/codex-patched-installer">查看源码</a>
     </div>
     <div class="grid">
       <div class="tile">
-        <strong>Install</strong>
-        Extract the ZIP, open PowerShell, then run <code>.\Install-CodexPatched.ps1</code>.
+        <strong>安装方式</strong>
+        解压 ZIP，在 PowerShell 中运行 <code>.\Install-CodexPatched.ps1</code>。
       </div>
       <div class="tile">
-        <strong>Requirements</strong>
-        Windows, official Codex desktop app installed, and Node.js LTS with <code>npx</code>.
+        <strong>环境要求</strong>
+        Windows、已安装官方 Codex 桌面应用，以及带 <code>npx</code> 的 Node.js LTS。
       </div>
       <div class="tile">
-        <strong>Features</strong>
-        API-key Fast mode, GPT-5.6 model catalog, ultra/max effort UI compatibility, and optional remote-plugin sync.
+        <strong>主要功能</strong>
+        API Key Fast Mode、GPT-5.6 模型目录、Ultra/Max effort UI 兼容，以及可选远程插件同步。
       </div>
     </div>
   </main>

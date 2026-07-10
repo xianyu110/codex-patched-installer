@@ -14,18 +14,18 @@ function Write-Step([string]$Message) {
 
 function Require-Command([string]$Name, [string]$Help) {
   if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
-    throw "Missing required command '$Name'. $Help"
+    throw "缺少必需命令 '$Name'。$Help"
   }
 }
 
 $PackageRoot = [System.IO.Path]::GetFullPath($PSScriptRoot)
 $InstallDir = [System.IO.Path]::GetFullPath($InstallDir)
 
-Write-Step "Package root: $PackageRoot"
-Write-Step "Install directory: $InstallDir"
+Write-Step "安装包目录：$PackageRoot"
+Write-Step "安装目录：$InstallDir"
 
-Require-Command "node" "Install Node.js LTS, then rerun this installer."
-Require-Command "npx" "Install Node.js LTS with npm, then rerun this installer."
+Require-Command "node" "请先安装 Node.js LTS，然后重新运行安装器。"
+Require-Command "npx" "请先安装包含 npm/npx 的 Node.js LTS，然后重新运行安装器。"
 
 New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
 
@@ -40,14 +40,14 @@ $files = @(
 foreach ($file in $files) {
   $src = Join-Path $PackageRoot $file
   if (-not (Test-Path -LiteralPath $src)) {
-    throw "Installer package is missing $file"
+    throw "安装包缺少文件：$file"
   }
   Copy-Item -LiteralPath $src -Destination (Join-Path $InstallDir $file) -Force
 }
 
 if (-not $NoRunPatch) {
   $patchScript = Join-Path $InstallDir "Patch-CodexApp.ps1"
-  Write-Step "Running patch script..."
+  Write-Step "正在运行补丁脚本..."
   if ($SourceApp) {
     & $patchScript -SourceApp $SourceApp
   } else {
@@ -59,7 +59,7 @@ $shortcut = Join-Path $InstallDir "Codex Patched.lnk"
 if (-not $NoDesktopShortcut -and (Test-Path -LiteralPath $shortcut)) {
   $desktop = [Environment]::GetFolderPath("DesktopDirectory")
   Copy-Item -LiteralPath $shortcut -Destination (Join-Path $desktop "Codex Patched.lnk") -Force
-  Write-Step "Desktop shortcut created."
+  Write-Step "已创建桌面快捷方式。"
 }
 
-Write-Step "Done. Open 'Codex Patched.lnk' from $InstallDir."
+Write-Step "完成。请从 $InstallDir 打开 'Codex Patched.lnk'。"

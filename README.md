@@ -1,67 +1,67 @@
-# Codex Patched Installer
+# Codex Patched 安装器
 
-Unofficial Windows installer for a local patched copy of the Codex desktop app.
+这是一个 Windows 上使用的非官方 Codex Patched 安装器。
 
-This repository does **not** redistribute the Codex App binaries. The installer locates the official Codex App already installed on the user's computer, copies it to a separate local directory, patches the copy, and creates a `Codex Patched.lnk` shortcut.
+本仓库 **不重新分发 Codex App 官方二进制文件**。安装器会在用户自己的电脑上自动定位已经安装的官方 Codex App，把完整应用复制到独立目录，再对副本打补丁，并创建 `Codex Patched.lnk` 快捷方式。
 
-## Download
+## 下载
 
-Download the latest installer ZIP from the project page or GitHub Releases:
+请从项目主页或 GitHub Releases 下载最新版安装包：
 
 <https://xianyu110.github.io/codex-patched-installer/>
 
-## Requirements
+## 环境要求
 
 - Windows
-- Official Codex desktop app already installed
-- Node.js LTS with `node` and `npx` available in `PATH`
-- Network access during install, because the patcher downloads `@electron/asar` and the current official model catalog from OpenAI's `openai/codex` repository
+- 已经安装官方 Codex 桌面应用
+- 已安装 Node.js LTS，并且 `node`、`npx` 能在 PowerShell 中运行
+- 安装时需要网络访问，因为补丁脚本会下载 `@electron/asar`，并从 OpenAI 官方 `openai/codex` 仓库读取最新模型目录
 
-## Install
+## 安装方法
 
-1. Download `CodexPatched-Installer.zip`.
-2. Extract it.
-3. Open PowerShell in the extracted folder.
-4. Run:
+1. 下载 `CodexPatched-Installer.zip`。
+2. 解压 ZIP。
+3. 在解压后的文件夹中打开 PowerShell。
+4. 运行：
 
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass -Force
 .\Install-CodexPatched.ps1
 ```
 
-By default the patched copy is installed to:
+默认安装目录：
 
 ```text
 %LOCALAPPDATA%\Programs\CodexPatched
 ```
 
-The installer creates a desktop shortcut named `Codex Patched.lnk`.
+安装完成后会创建桌面快捷方式 `Codex Patched.lnk`。
 
-## What It Patches
+## 补丁内容
 
-- Enables Fast/service tier UI for both `chatgpt` and `apikey` auth methods only.
-- Keeps model-level service tier support checks intact.
-- Adds/keeps GPT-5.6 Sol, Terra, and Luna from the official Codex model catalog.
-- Enables `low`, `medium`, `high`, `xhigh`, `max`, and `ultra` reasoning visibility where supported.
-- Keeps Sol Ultra normalized to Responses wire `reasoning.effort = "max"` with `context = "all_turns"`.
-- Adds optional remote-plugin local marketplace sync scripts without changing API key login state.
+- Fast/service tier UI 同时允许 `chatgpt` 与 `apikey` 登录方式，但不会放开 Copilot、Bedrock 等其他模式。
+- 保留模型自身的 service tier 支持检查，不会让不支持 Fast 的模型伪装支持。
+- 从 OpenAI 官方 Codex 模型目录添加/保留 GPT-5.6 Sol、Terra、Luna。
+- 按模型支持情况显示 `low`、`medium`、`high`、`xhigh`、`max`、`ultra` reasoning effort。
+- Sol 的 Ultra 在 Responses 请求线上仍按官方设计规范化为 `reasoning.effort = "max"`，并带 `context = "all_turns"`。
+- 附带可选的远程插件本地 marketplace 同步脚本，不改变 App 的 API Key 登录状态。
 
-## Remote Plugins
+## 远程插件
 
-The package includes `sync-remote-plugins.ps1` and `plugin-account.json`.
+安装包包含 `sync-remote-plugins.ps1` 和 `plugin-account.json`。
 
-Leave `plugin-account.json` blank to use local bundle cache only. If you use `authFile` or `accessToken`, it must be a ChatGPT/Codex OAuth token, not an OpenAI API key. Tokens starting with `sk-` are rejected and are not logged.
+如果 `plugin-account.json` 留空，脚本只会使用本机已有的插件 bundle 缓存。若填写 `authFile` 或 `accessToken`，必须使用 ChatGPT/Codex OAuth token，不能使用 OpenAI API Key。以 `sk-` 开头的值会被拒绝，脚本不会打印 token。
 
-Plugin visibility does not grant external service authorization. Connectors such as GitHub or Figma may still require their own OAuth.
+插件出现在列表中不代表外部服务已经授权。GitHub、Figma、Google、Slack 等连接器仍可能需要各自的 OAuth 或工作区授权。
 
-## Update
+## 更新
 
-Official App updates do not update the patched copy. After updating the official Codex App, rerun:
+官方 Codex App 更新不会自动更新这个补丁副本。官方 App 更新后，请重新运行：
 
 ```powershell
 %LOCALAPPDATA%\Programs\CodexPatched\Patch-CodexApp.ps1
 ```
 
-## Disclaimer
+## 免责声明
 
-This is an unofficial patcher. It is not affiliated with or endorsed by OpenAI. Use at your own risk.
+这是非官方补丁工具，不隶属于 OpenAI，也不代表 OpenAI 官方支持。请自行判断风险后使用。
