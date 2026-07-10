@@ -1,0 +1,9 @@
+{
+  "authFile": "",
+  "accessToken": "",
+  "chatgptAccountId": "",
+  "baseUrl": "https://chatgpt.com/backend-api",
+  "include": [],
+  "downloadMissing": false,
+  "install": []
+}
