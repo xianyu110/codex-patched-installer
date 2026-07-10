@@ -2,8 +2,9 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
-const root = path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Za-z]:\/)/, "$1");
+const root = path.dirname(fileURLToPath(import.meta.url));
 const accountPath = path.join(root, "plugin-account.json");
 const marketplaceRoot = path.join(root, "plugin-marketplace");
 const marketplacePlugins = path.join(marketplaceRoot, "plugins");
@@ -182,7 +183,8 @@ async function downloadBundle(name, url, dest, token, account) {
   fs.writeFileSync(archive, buffer);
   fs.rmSync(dest, { recursive: true, force: true });
   fs.mkdirSync(dest, { recursive: true });
-  const result = spawnSync("tar.exe", ["-xf", archive, "-C", dest], { encoding: "utf8" });
+  const tarCommand = process.platform === "win32" ? "tar.exe" : "tar";
+  const result = spawnSync(tarCommand, ["-xf", archive, "-C", dest], { encoding: "utf8" });
   if (result.status !== 0) {
     fs.rmSync(dest, { recursive: true, force: true });
     throw new Error((result.stderr || result.stdout || "tar extraction failed").trim());

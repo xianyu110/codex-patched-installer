@@ -99,28 +99,29 @@
 </head>
 <body>
   <main>
-    <div class="eyebrow">非官方 Windows 补丁安装器</div>
+    <div class="eyebrow">非官方 Windows 与 macOS 补丁安装器</div>
     <h1>Codex Patched 安装器</h1>
     <p>
       在你的电脑上基于已安装的官方 Codex App 构建一个独立的补丁副本。
       安装包不包含、也不重新分发官方 Codex App 二进制文件。
     </p>
     <div class="actions">
-      <a class="button primary" href="https://github.com/xianyu110/codex-patched-installer/releases/latest/download/CodexPatched-Installer.zip">下载安装包 ZIP</a>
+      <a class="button primary" href="https://github.com/xianyu110/codex-patched-installer/releases/latest/download/CodexPatched-macOS-Installer.zip">下载 macOS ZIP</a>
+      <a class="button secondary" href="https://github.com/xianyu110/codex-patched-installer/releases/latest/download/CodexPatched-Installer.zip">下载 Windows ZIP</a>
       <a class="button secondary" href="https://github.com/xianyu110/codex-patched-installer">查看源码</a>
     </div>
     <div class="grid">
       <div class="tile">
-        <strong>安装方式</strong>
-        解压 ZIP，在 PowerShell 中运行 <code>.\Install-CodexPatched.ps1</code>。
+        <strong>macOS 安装</strong>
+        解压 ZIP 后运行 <code>installer/macos/Install-CodexPatched-macos.sh</code>。
       </div>
       <div class="tile">
-        <strong>环境要求</strong>
-        Windows、已安装官方 Codex 桌面应用，以及带 <code>npx</code> 的 Node.js LTS。
+        <strong>Windows 安装</strong>
+        在 PowerShell 中运行 <code>.\Install-CodexPatched.ps1</code>。
       </div>
       <div class="tile">
-        <strong>主要功能</strong>
-        API Key Fast Mode、GPT-5.6 模型目录、Ultra/Max effort UI 兼容，以及可选远程插件同步。
+        <strong>共同要求</strong>
+        已安装官方 Codex 桌面应用，以及带 <code>npx</code> 的 Node.js LTS。
       </div>
     </div>
   </main>
